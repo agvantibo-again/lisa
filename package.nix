@@ -1,6 +1,6 @@
 { python3Packages }:
 with python3Packages;
-buildPythonApplication {
+buildPythonPackage {
   pname = "lisa-flask";
   version = "1.0";
 
@@ -8,9 +8,16 @@ buildPythonApplication {
   build-system = [ setuptools ];
 
   propagatedBuildInputs = [
+    werkzeug
+    pyyaml
+
     flask
     flask-httpauth
+
+    waitress
   ];
 
-  src = ./.;
+  pythonImportsCheck = [ "lisa_flask" ];
+
+  src = ./lisa_flask;
 }

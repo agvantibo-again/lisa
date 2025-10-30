@@ -3,10 +3,9 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="lisa-flask",
+    name="lisa_flask",
     version="1.0",
     # Modules to import from other scripts:
-    packages=find_packages(),
-    # Executables
-    scripts=["app.py"],
+    packages=["lisa_flask"],
+    package_data={"lisa_flask": ["templates/*", "static/*"]},
 )

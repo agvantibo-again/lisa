@@ -20,6 +20,11 @@ pkgs.mkShellNoCC {
   buildInputs = with pkgs; [
     python3
     black
+
+    docker
+    dive
   ];
   propagatedBuildInputs = package.propagatedBuildInputs;
+
+  "DOCKER_HOST" = "unix:///run/user/1000/docker.sock";
 }

@@ -1,3 +1,9 @@
+result
+data/
+!data/config.yml
+*.private
+
+### Stock GitHub .gitignore for Python ###
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]

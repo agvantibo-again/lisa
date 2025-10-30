@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>{{ app_name }}</title>
+</head>
+
+<body>
+  <h1>Отработанные часы за {{ date_now }}</h1>
+  <h3>Добрый день, {{ user_name }}</h3>
+  <form action="{{ url_for('post_submit') }}" method="post">
+    <div class="form-row">
+      <label for="hours">Введите количество часов: (0-24)</label>
+      <input type="number" id="hours" name="hours" min="0" max="24" value="1" />
+    </div>
+      <input type="submit" id="submit" value="Отправить">
+  </form>
+  <div class="data-view">
+    <h3>Прошлые посылки</h3>
+    <table>
+      {% for item in data %}
+        <TR class="data-line">
+          <TD class="data-date">{{ item[0] }}</TD>
+          <TD class="data-value">{{ item[1] }}</TD>
+        </TR>
+      {% endfor %}
+    </table>
+  </div>
+</body>
+
+</html>
