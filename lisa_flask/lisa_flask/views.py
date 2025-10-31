@@ -23,7 +23,7 @@ def get_root():
         user_name=user.real_name,
         app_name="LISA",
         date_now=date.today().isoformat(),
-        data=app.users[auth.current_user()].data.items(),
+        data=reversed(app.users[auth.current_user()].data.items()),
     )
 
 
@@ -33,5 +33,6 @@ def post_submit():
     user = app.users[auth.current_user()]
     data = request.form
     user.data[date.today().isoformat()] = data["hours"]
+    app.data.write()
 
     return redirect(url_for("get_root"))

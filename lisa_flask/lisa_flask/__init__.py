@@ -1,6 +1,6 @@
-from flask import Flask, g
+from flask import Flask
 from flask_httpauth import HTTPBasicAuth
-from .user import User
+from .user import User, Data
 import csv
 import yaml
 import logging
@@ -45,18 +45,8 @@ def mk_app():
             )
 
         data_path = os.path.join(app.config["DATA_DIR"], app.config["DATA_FILE"])
-        app.users = dict()
-        with open(data_path) as datafile:
-            data = csv.reader(datafile, dialect="excel")
-            table_headers = next(data)[3:]
-            for username, realname, pwdigest, *user_data in data:
-                user_ddict = dict()
-                for i_cell in range(len(user_data)):
-                    if user_data[i_cell]:
-                        user_ddict[table_headers[i_cell]] = int(user_data[i_cell])
-                app.users[username] = User(
-                    username, realname, user_ddict, new_password_digest=pwdigest
-                )
+        app.data = Data(data_path, dialect=app.config["CSV_DIALECT"])
+        app.users = app.data.store
 
     return app
 
