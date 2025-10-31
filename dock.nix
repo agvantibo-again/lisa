@@ -6,6 +6,7 @@
 
   tag ? "latest",
   port ? "80",
+  host ? "0.0.0.0"
 }:
 
 pkgs.dockerTools.buildLayeredImage {
@@ -27,14 +28,16 @@ pkgs.dockerTools.buildLayeredImage {
   config = {
     Entrypoint = "/bin/python";
     Cmd = [
+      "-u"
       "-m"
       "lisa_flask"
     ];
     Env = [
-      ''LISA_HTTP_PORT="${port}"''
-      ''PYTHONDONTWRITEBYTECODE="1"''
-      ''PYTHONUNBUFFERED=1''
-      # "LISA_HTTP_HOST" = host;
+      "LISA_HTTP_HOST=${host}"
+      "LISA_HTTP_PORT=${port}"
+      "PYTHONDONTWRITEBYTECODE=1"
+      "PYTHONUNBUFFERED=1"
+      "LISA_DATA_DIR=/data"
     ];
     Volumes = {
       "/data" = {};
