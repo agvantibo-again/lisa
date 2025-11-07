@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_httpauth import HTTPBasicAuth
-from .user import User, Data
+
+# from .user import User, Data
 import csv
 import yaml
 import logging
@@ -17,12 +18,18 @@ def mk_app():
     app = Flask(__name__)
 
     with app.app_context():
-        from lisa_flask import views
+        from . import views
+        from . import user
 
     app.config["DATA_DIR"] = (
         os.environ["LISA_DATA_DIR"]
         if "LISA_DATA_DIR" in os.environ.keys()
         else "./data"
+    )
+    app.config["PASSWORD_DICT"] = (
+        os.environ["LISA_PASSWORD_DICT"]
+        if "LISA_PASSWORD_DICT" in os.environ.keys()
+        else None
     )
     app.config["LOG_LEVEL"] = 6
     app.config["TESTING"] = False
@@ -45,7 +52,7 @@ def mk_app():
             )
 
         data_path = os.path.join(app.config["DATA_DIR"], app.config["DATA_FILE"])
-        app.data = Data(data_path, dialect=app.config["CSV_DIALECT"])
+        app.data = user.Data(data_path, dialect=app.config["CSV_DIALECT"])
         app.users = app.data.store
 
     return app

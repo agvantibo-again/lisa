@@ -1,13 +1,17 @@
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask import current_app as app
+import click
 
 from datetime import date
 import csv
+import sys
 import shutil
+import secrets
 
 
 class User:
-    '''Basically a struct representing a user'''
+    """Basically a struct representing a user"""
+
     name: str = "nobody"
     real_name: str = "Критическая Ошибка"
     data: dict = {}
@@ -28,13 +32,59 @@ class User:
     def verify_password(self, new_password):
         return check_password_hash(self.password_digest, new_password)
 
+    def __repr__(self):
+        return f"User {self.name} ({self.real_name}), pw: {self.password_digest}"
+
+
+def generate_password(dictionary: list, len=3):
+    return "-".join([secrets.choice(dictionary) for i in range(len)])
+
+
+username_prompt = "Internal user name"
+cname_prompt = "Frontend user name [visible to them]"
+pass_prompt = "New user password"
+db_prompt = "Add user to database"
+
+
+@app.cli.command("mkuser")
+@click.option("--name", "-n", prompt=username_prompt, help=username_prompt)
+@click.option("--cname", "-c", prompt=cname_prompt, help=cname_prompt)
+@click.option("--password", "-p", help=pass_prompt, required=False)
+@click.option("--add", is_flag=True, help=pass_prompt)
+def create_user(name, cname, password, add):
+    if not password:
+        dict_file = app.config["PASSWORD_DICT"]
+        if not dict_file:
+            raise ValueError(
+                "No PASSWORD_DICT found. Set LISA_PASSWORD_DICT or add PASSWORD_DICT to configuration"
+            )
+        with open(app.config["PASSWORD_DICT"]) as pwfile:
+            password = generate_password(
+                list(map(lambda a: a.strip(), pwfile.readlines()))
+            )
+
+    new_user = User(name, cname, dict(), password=password)
+    print(new_user)
+    print(f"Password: {password}")
+    print("To hide the password, run `clear`/`cls`")
+    if add or click.confirm("Add user to database?"):
+        if new_user.name in app.users.keys():
+            if not click.confirm(
+                f"User {new_user.name} is already in the database. Overwrite?"
+            ):
+                return
+        app.users[new_user.name] = new_user
+        app.data.write()
+
 
 class Data:
-    '''An abstraction over the state save/load interface'''
+    """An abstraction over the state save/load interface"""
+
     store = dict()
     path = ""
     dialect = "excel"
     table_h0 = ("Имя пользователя", "Кириллическое имя", "Хеш пароля")
+
     def __init__(self, data_path, dialect="excel", **kwargs):
         self.path = data_path
         with open(data_path) as datafile:

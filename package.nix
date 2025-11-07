@@ -13,6 +13,7 @@ buildPythonPackage {
 
     flask
     flask-httpauth
+    click
 
     waitress
   ];
